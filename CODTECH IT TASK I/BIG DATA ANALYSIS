@@ -1,0 +1,395 @@
+BIG DATA ANALYSIS
+TASK -
+PERFORM ANALYSIS ON A LARGE DATASET TO DEMONSTRATE SCALABILITY.
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+%matplotlib inline
+import seaborn as sns
+data = pd.read_csv('Diwali Sales.csv', encoding= 'unicode_escape')
+print (data)
+       User_ID    Cust_name Product_ID Gender Age Group  Age  Marital_Status  \
+0      1002903    Sanskriti  P00125942      F     26-35   28               0   
+1      1000732       Kartik  P00110942      F     26-35   35               1   
+2      1001990        Bindu  P00118542      F     26-35   35               1   
+3      1001425       Sudevi  P00237842      M      0-17   16               0   
+4      1000588         Joni  P00057942      M     26-35   28               1   
+...        ...          ...        ...    ...       ...  ...             ...   
+11246  1000695      Manning  P00296942      M     18-25   19               1   
+11247  1004089  Reichenbach  P00171342      M     26-35   33               0   
+11248  1001209        Oshin  P00201342      F     36-45   40               0   
+11249  1004023       Noonan  P00059442      M     36-45   37               0   
+11250  1002744      Brumley  P00281742      F     18-25   19               0   
+
+                 State      Zone       Occupation Product_Category  Orders  \
+0          Maharashtra   Western       Healthcare             Auto       1   
+1      AndhraÂ Pradesh  Southern             Govt             Auto       3   
+2        Uttar Pradesh   Central       Automobile             Auto       3   
+3            Karnataka  Southern     Construction             Auto       2   
+4              Gujarat   Western  Food Processing             Auto       2   
+...                ...       ...              ...              ...     ...   
+11246      Maharashtra   Western         Chemical           Office       4   
+11247          Haryana  Northern       Healthcare       Veterinary       3   
+11248   Madhya Pradesh   Central          Textile           Office       4   
+11249        Karnataka  Southern      Agriculture           Office       3   
+11250      Maharashtra   Western       Healthcare           Office       3   
+
+        Amount  Status  unnamed1  
+0      23952.0     NaN       NaN  
+1      23934.0     NaN       NaN  
+2      23924.0     NaN       NaN  
+3      23912.0     NaN       NaN  
+4      23877.0     NaN       NaN  
+...        ...     ...       ...  
+11246    370.0     NaN       NaN  
+11247    367.0     NaN       NaN  
+11248    213.0     NaN       NaN  
+11249    206.0     NaN       NaN  
+11250    188.0     NaN       NaN  
+
+[11251 rows x 15 columns]
+data.head()
+User_ID	Cust_name	Product_ID	Gender	Age Group	Age	Marital_Status	State	Zone	Occupation	Product_Category	Orders	Amount	Status	unnamed1
+0	1002903	Sanskriti	P00125942	F	26-35	28	0	Maharashtra	Western	Healthcare	Auto	1	23952.0	NaN	NaN
+1	1000732	Kartik	P00110942	F	26-35	35	1	AndhraÂ Pradesh	Southern	Govt	Auto	3	23934.0	NaN	NaN
+2	1001990	Bindu	P00118542	F	26-35	35	1	Uttar Pradesh	Central	Automobile	Auto	3	23924.0	NaN	NaN
+3	1001425	Sudevi	P00237842	M	0-17	16	0	Karnataka	Southern	Construction	Auto	2	23912.0	NaN	NaN
+4	1000588	Joni	P00057942	M	26-35	28	1	Gujarat	Western	Food Processing	Auto	2	23877.0	NaN	NaN
+data.shape
+(11251, 15)
+data.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 11251 entries, 0 to 11250
+Data columns (total 15 columns):
+ #   Column            Non-Null Count  Dtype  
+---  ------            --------------  -----  
+ 0   User_ID           11251 non-null  int64  
+ 1   Cust_name         11251 non-null  object 
+ 2   Product_ID        11251 non-null  object 
+ 3   Gender            11251 non-null  object 
+ 4   Age Group         11251 non-null  object 
+ 5   Age               11251 non-null  int64  
+ 6   Marital_Status    11251 non-null  int64  
+ 7   State             11251 non-null  object 
+ 8   Zone              11251 non-null  object 
+ 9   Occupation        11251 non-null  object 
+ 10  Product_Category  11251 non-null  object 
+ 11  Orders            11251 non-null  int64  
+ 12  Amount            11239 non-null  float64
+ 13  Status            0 non-null      float64
+ 14  unnamed1          0 non-null      float64
+dtypes: float64(3), int64(4), object(8)
+memory usage: 1.3+ MB
+​
+Clean the data
+data.drop(['Status', 'unnamed1'], axis=1, inplace=True)
+data.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 11251 entries, 0 to 11250
+Data columns (total 13 columns):
+ #   Column            Non-Null Count  Dtype  
+---  ------            --------------  -----  
+ 0   User_ID           11251 non-null  int64  
+ 1   Cust_name         11251 non-null  object 
+ 2   Product_ID        11251 non-null  object 
+ 3   Gender            11251 non-null  object 
+ 4   Age Group         11251 non-null  object 
+ 5   Age               11251 non-null  int64  
+ 6   Marital_Status    11251 non-null  int64  
+ 7   State             11251 non-null  object 
+ 8   Zone              11251 non-null  object 
+ 9   Occupation        11251 non-null  object 
+ 10  Product_Category  11251 non-null  object 
+ 11  Orders            11251 non-null  int64  
+ 12  Amount            11239 non-null  float64
+dtypes: float64(1), int64(4), object(8)
+memory usage: 1.1+ MB
+data.isnull()
+User_ID	Cust_name	Product_ID	Gender	Age Group	Age	Marital_Status	State	Zone	Occupation	Product_Category	Orders	Amount
+0	False	False	False	False	False	False	False	False	False	False	False	False	False
+1	False	False	False	False	False	False	False	False	False	False	False	False	False
+2	False	False	False	False	False	False	False	False	False	False	False	False	False
+3	False	False	False	False	False	False	False	False	False	False	False	False	False
+4	False	False	False	False	False	False	False	False	False	False	False	False	False
+...	...	...	...	...	...	...	...	...	...	...	...	...	...
+11246	False	False	False	False	False	False	False	False	False	False	False	False	False
+11247	False	False	False	False	False	False	False	False	False	False	False	False	False
+11248	False	False	False	False	False	False	False	False	False	False	False	False	False
+11249	False	False	False	False	False	False	False	False	False	False	False	False	False
+11250	False	False	False	False	False	False	False	False	False	False	False	False	False
+11251 rows × 13 columns
+
+data.isnull().sum()
+User_ID              0
+Cust_name            0
+Product_ID           0
+Gender               0
+Age Group            0
+Age                  0
+Marital_Status       0
+State                0
+Zone                 0
+Occupation           0
+Product_Category     0
+Orders               0
+Amount              12
+dtype: int64
+data.dropna(inplace=True)
+data.shape
+(11239, 13)
+data.isnull().sum()
+User_ID             0
+Cust_name           0
+Product_ID          0
+Gender              0
+Age Group           0
+Age                 0
+Marital_Status      0
+State               0
+Zone                0
+Occupation          0
+Product_Category    0
+Orders              0
+Amount              0
+dtype: int64
+​
+#change the data type of the colums
+​
+data['Amount'] = data['Amount'].astype('int')
+data['Amount'].dtype
+dtype('int32')
+data.columns
+Index(['User_ID', 'Cust_name', 'Product_ID', 'Gender', 'Age Group', 'Age',
+       'Marital_Status', 'State', 'Zone', 'Occupation', 'Product_Category',
+       'Orders', 'Amount'],
+      dtype='object')
+​
+#describe the numeric columns in your data set
+data.describe()
+User_ID	Age	Marital_Status	Orders	Amount
+count	1.123900e+04	11239.000000	11239.000000	11239.000000	11239.000000
+mean	1.003004e+06	35.410357	0.420055	2.489634	9453.610553
+std	1.716039e+03	12.753866	0.493589	1.114967	5222.355168
+min	1.000001e+06	12.000000	0.000000	1.000000	188.000000
+25%	1.001492e+06	27.000000	0.000000	2.000000	5443.000000
+50%	1.003064e+06	33.000000	0.000000	2.000000	8109.000000
+75%	1.004426e+06	43.000000	1.000000	3.000000	12675.000000
+max	1.006040e+06	92.000000	1.000000	4.000000	23952.000000
+data[['Age', 'Orders', 'Amount']].describe()
+Age	Orders	Amount
+count	11239.000000	11239.000000	11239.000000
+mean	35.410357	2.489634	9453.610553
+std	12.753866	1.114967	5222.355168
+min	12.000000	1.000000	188.000000
+25%	27.000000	2.000000	5443.000000
+50%	33.000000	2.000000	8109.000000
+75%	43.000000	3.000000	12675.000000
+max	92.000000	4.000000	23952.000000
+​
+Exploratory Data Analysis
+GENDER
+ax = sns.countplot(x = 'Gender',data = data)
+​
+for bars in ax.containers:
+    ax.bar_label(bars)
+
+# plotting a bar chart for gender vs total amount
+​
+sales_gen = data.groupby(['Gender'], as_index=False)['Amount'].sum().sort_values(by='Amount', ascending=False)
+​
+sns.barplot(x = 'Gender',y= 'Amount' ,data = sales_gen)
+<Axes: xlabel='Gender', ylabel='Amount'>
+
+AGE
+#Ratio of male and female in Age group
+ax = sns.countplot(data = data, x = 'Age Group', hue = 'Gender')
+​
+for bars in ax.containers:
+    ax.bar_label(bars)
+
+# Total Amount vs Age Group
+sales_age = data.groupby(['Age Group'], as_index=False)['Amount'].sum().sort_values(by='Amount', ascending=False)
+​
+sns.barplot(x = 'Age Group',y= 'Amount' ,data = sales_age)
+<Axes: xlabel='Age Group', ylabel='Amount'>
+
+STATE
+# Grouping and sorting top 10 states by total orders
+sales_state = data.groupby(['State'], as_index=False)['Orders'].sum().sort_values(by='Orders', ascending=False).head(10)
+​
+# Define colors (Matplotlib's built-in colormap)
+colors = plt.cm.get_cmap('tab10', len(sales_state))  # 'tab10' provides 10 distinct colors
+​
+# Create Pie Chart
+plt.figure(figsize=(8, 6))
+plt.pie(
+    sales_state['Orders'], 
+    labels=sales_state['State'], 
+    autopct='%1.1f%%', 
+    colors=[colors(i) for i in range(len(sales_state))], 
+    startangle=140, 
+    wedgeprops={'edgecolor': 'black'})
+​
+# Title
+plt.title("Total Orders from Top 10 States")
+​
+# Show plot
+plt.show()
+C:\Users\debar\AppData\Local\Temp\ipykernel_2420\3602591274.py:5: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed two minor releases later. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap(obj)`` instead.
+  colors = plt.cm.get_cmap('tab10', len(sales_state))  # 'tab10' provides 10 distinct colors
+
+# Grouping and sorting top 10 states by total sales amount
+sales_state = data.groupby(['State'], as_index=False)['Amount'].sum().sort_values(by='Amount', ascending=False).head(10)
+​
+# Define colors (Matplotlib's built-in colormap)
+colors = plt.cm.get_cmap('tab10', len(sales_state))  # 'tab10' provides distinct colors
+​
+# Create Pie Chart
+plt.figure(figsize=(8, 6))
+plt.pie(
+    sales_state['Amount'], 
+    labels=sales_state['State'], 
+    autopct='%1.1f%%', 
+    colors=[colors(i) for i in range(len(sales_state))], 
+    startangle=140, 
+    wedgeprops={'edgecolor': 'black'})
+​
+# Title
+plt.title("Total Sales from Top 10 States")
+​
+# Show plot
+plt.show()
+C:\Users\debar\AppData\Local\Temp\ipykernel_2420\2369126773.py:5: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed two minor releases later. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap(obj)`` instead.
+  colors = plt.cm.get_cmap('tab10', len(sales_state))  # 'tab10' provides distinct colors
+
+MARTIAL STATUS
+ax = sns.countplot(data = data, x = 'Marital_Status')
+​
+sns.set(rc={'figure.figsize':(7,5)})
+for bars in ax.containers:
+    ax.bar_label(bars)
+
+sales_state = data.groupby(['Marital_Status', 'Gender'], as_index=False)['Amount'].sum().sort_values(by='Amount', ascending=False)
+​
+sns.set(rc={'figure.figsize':(6,5)})
+sns.barplot(data = sales_state, x = 'Marital_Status',y= 'Amount', hue='Gender')
+<Axes: xlabel='Marital_Status', ylabel='Amount'>
+
+Occupation
+# Set figure size
+sns.set(rc={'figure.figsize': (20, 5)})
+​
+# Create countplot with green bars
+ax = sns.countplot(data=data, x='Occupation', color='green')
+​
+# Add bar labels
+for bars in ax.containers:
+    ax.bar_label(bars)
+​
+# Show plot
+plt.show()
+
+sales_state = data.groupby(['Occupation'], as_index=False)['Amount'].sum().sort_values(by='Amount', ascending=False)
+​
+sns.set(rc={'figure.figsize':(20,5)})
+sns.barplot(data = sales_state, x = 'Occupation', y = 'Amount', color='green')
+<Axes: xlabel='Occupation', ylabel='Amount'>
+
+Product Category
+sns.set(rc={'figure.figsize':(20,5)})
+ax = sns.countplot(data = data, x = 'Product_Category', color='yellow')
+​
+# Rotate x-axis labels
+ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+​
+# Add labels to the bars
+for bars in ax.containers:
+    ax.bar_label(bars)
+C:\Users\debar\AppData\Local\Temp\ipykernel_2420\4212107217.py:5: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+  ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+
+sales_state = data.groupby(['Product_Category'], as_index=False)['Amount'].sum().sort_values(by='Amount', ascending=False).head(10)
+​
+sns.set(rc={'figure.figsize':(20,5)})
+ax = sns.barplot(data = sales_state, x = 'Product_Category', y = 'Amount', color='yellow')
+​
+# Rotate x-axis labels
+ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+C:\Users\debar\AppData\Local\Temp\ipykernel_2420\2251362645.py:7: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+  ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
+[Text(0, 0, 'Food'),
+ Text(1, 0, 'Clothing & Apparel'),
+ Text(2, 0, 'Electronics & Gadgets'),
+ Text(3, 0, 'Footwear & Shoes'),
+ Text(4, 0, 'Furniture'),
+ Text(5, 0, 'Games & Toys'),
+ Text(6, 0, 'Sports Products'),
+ Text(7, 0, 'Beauty'),
+ Text(8, 0, 'Auto'),
+ Text(9, 0, 'Stationery')]
+
+From above graphs we can see that most of the sold products are from Food, Clothing and Electronics category
+sales_state = data.groupby(['Product_ID'], as_index=False)['Orders'].sum().sort_values(by='Orders', ascending=False).head(10)
+​
+sns.set(rc={'figure.figsize':(20,5)})
+sns.barplot(data = sales_state, x = 'Product_ID', y = 'Orders', color='skyblue')
+<Axes: xlabel='Product_ID', ylabel='Orders'>
+
+# top 10 most sold products (same thing as above)
+​
+fig1, ax1 = plt.subplots(figsize=(12,7))
+data.groupby('Product_ID')['Orders'].sum().nlargest(10).sort_values(ascending=False).plot(kind='line')
+<Axes: xlabel='Product_ID'>
+
+distribution of customers by Age
+plt.figure(figsize=(10, 6))
+sns.histplot(data=data, x='Age', bins=10, kde=False, color='blue')
+plt.title('Distribution of Customers by Age')
+plt.xlabel('Age')
+plt.ylabel('Number of Customers')
+plt.show()
+
+Distribution of Customers by Age (Numerical):
+plt.figure(figsize=(10, 6))
+sns.countplot(data=data, x='Age Group', palette='viridis', order=data['Age Group'].value_counts().index)
+plt.title('Number of Customers by Age Group')
+plt.xlabel('Age Group')
+plt.ylabel('Number of Customers')
+plt.show()
+C:\Users\debar\AppData\Local\Temp\ipykernel_2420\3059251998.py:2: FutureWarning: 
+
+Passing `palette` without assigning `hue` is deprecated and will be removed in v0.14.0. Assign the `x` variable to `hue` and set `legend=False` for the same effect.
+
+  sns.countplot(data=data, x='Age Group', palette='viridis', order=data['Age Group'].value_counts().index)
+
+Number of Customers by Age Group (Categorical):
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=data, x='Age', y='Amount', hue='Gender', palette='coolwarm', alpha=0.7)
+plt.title('Relationship between Age and Amount Spent')
+plt.xlabel('Age')
+plt.ylabel('Amount Spent')
+plt.legend(title='Gender')
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=data, x='Age', y='Amount', hue='Gender', palette='Set2', alpha=0.7)
+plt.title('Relationship between Age and Amount Spent')
+plt.xlabel('Age')
+plt.ylabel('Amount Spent')
+plt.legend(title='Gender')
+plt.show()
+
+Creating a heatmap to show correlations between numerical variables
+plt.figure(figsize=(8, 6))
+correlation_matrix = data[['Age', 'Orders', 'Amount']].corr()
+
+# Create a custom color palette (light pink and sky blue)
+custom_cmap = sns.light_palette("pink", as_cmap=True)
+sns.heatmap(correlation_matrix, annot=True, cmap=custom_cmap, fmt=".2f")
+
+plt.title('Correlation Heatmap of Numerical Variables')
+plt.show()
+plt.figure(figsize=(8, 6))
+correlation_matrix = data[['Age', 'Orders', 'Amount']].corr()
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Correlation Heatmap of Numerical Variables')
+plt.show()
